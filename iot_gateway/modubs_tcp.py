@@ -78,10 +78,9 @@ class ModbusClientHandler:
             print(f"Sensor {sensor_name} is {value} C")
             self.previous_values[index] = datapoint  
 
-
 class Datapoint:
     """
-    A helper class the represents a single sensor reading and its previous 
+    A helper class the represents a single sensor reading and its previous value
     
     Attributes:
     
@@ -114,7 +113,7 @@ class Datapoint:
         """
         Evaluate if the current reading differs from the previous one based on comparison criteria
 
-        If the temperature change is plus minus 1 degrees (MIN_TEMPURATE_CHANGE) and the time difference is less that 5 mins MIN_ELAPSED_TIME 
+        If the temperature change is plus minus 1 degrees (MIN_TEMPERATURE_CHANGE) and the time difference is less that 5 mins MIN_ELAPSED_TIME 
         the data point will be marked as not for sending.
 
         """
@@ -122,7 +121,7 @@ class Datapoint:
             return
         value_delta = abs(self.value - self.previous_datapoint.value)
         time_delta = (self.timestamp - self.previous_datapoint.timestamp).total_seconds() /60
-        if value_delta <= config.MIN_TEMPURATE_CHANGE and time_delta < config.MIN_ELAPSED_TIME:
+        if value_delta <= config.MIN_TEMPERATURE_CHANGE and time_delta < config.MIN_ELAPSED_TIME:
             self.changed=False
             self.send_point=False 
 
