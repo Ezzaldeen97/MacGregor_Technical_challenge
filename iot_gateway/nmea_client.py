@@ -17,21 +17,35 @@ class NmeaHandler:
         self.connect()
 
     def connect(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((self.host, self.port))
-        print("Connected to NMEA server.")
+        try:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.connect((self.host, self.port))
+            logger.info(f"Connection to NMEA Websocket on host '{self.host}' port '{self.port}' is successful")
+        except socket.timeout:
+            logger.error("Connection times out")
+        except Exception as e:
+
+            logger.error(f"Failed to connect to NMEA Websocket: {e}")
 
     def read_nmea_data(self):
-        self.sentence = self.sock.recv(1024).decode('ascii') #1 kilobyte
-        return self.sentence
-    def parse_data(self):
         try:
-            if not self.sentence.startswith('$') or '*' not in self.sentence:
-                logger.error("Invalid NMEA format")
+            data= self.sock.recv(1024).decode('ascii') #1 kilobyte
+            if not data:
+                logger.error("Socket Closed by server")
+            else:
+                return data
+            
+        except Exception as e:
+            logger.error(f"Unexpected error:{e}")
+
+
+    def parse_data(self, sentence:str):
+        try:
+            if not sentence.startswith('$') or '*' not in sentence:
+                logger.error(f"Invalid NMEA format {sentence}")
                 return
             else:
-                print(self.sentence)
-                data, checksum = self.sentence.split("*")
+                data, checksum = sentence.split("*")
                 fields= data.split(",")
                 talker_id = fields[0][1:3]
                 sentence_type= fields[0][3:]
@@ -41,13 +55,14 @@ class NmeaHandler:
                     "talker_id": talker_id,
                     "sentence_type":sentence_type,
                     "rate_of_turn_value": rot_value,
-                    "Status":status,
+                    "status":status,
                     "checksum":checksum}
-
+        except IndexError:
+            logger.error("Error in index the nmea sentence")
         except Exception as e:
             logger.error(f"Failed to parse nmea message {e}")       
 
 nmea_client=NmeaHandler(config.NMEA_PORT,config.NMEA_HOST)
 while True:
-    nmea_client.read_nmea_data()
-    print(nmea_client.parse_data())
+    sentence=nmea_client.read_nmea_data()
+    print(nmea_client.parse_data(sentence))
