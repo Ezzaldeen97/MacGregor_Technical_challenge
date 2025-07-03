@@ -10,13 +10,30 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__, file_name= 'logs/nmea_client.log')
 class NmeaHandler:
+    """
+    A handler class for connecting to NMEA TCP stream, reading and parsing
+
+    Params:
+    --------
+    - port(int): Port Number of the NMEA server.
+    - host (str): Host address of the NMEA server
+
+    """
     
-    def __init__(self, port:int, host:str):
+    def __init__(self, port:int, host:str) -> None:
         self.port = port
         self.host = host
         self.connect()
 
-    def connect(self):
+    def connect(self) -> None:
+        """
+        Attempts to establish a TCP connection to the NMEA (server)"
+
+        Returns:
+        --------
+        - None
+        
+        """
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((self.host, self.port))
@@ -27,7 +44,15 @@ class NmeaHandler:
 
             logger.error(f"Failed to connect to NMEA Websocket: {e}")
 
-    def read_nmea_data(self):
+    def read_nmea_data(self) -> str:
+        """
+        Reads a raw NMEA sentence.
+        
+        Returns:
+        --------
+        - data (str) | None : Decoded Nmea sentence (if successful) otherwise returns None
+        
+        """
         try:
             data= self.sock.recv(1024).decode('ascii') #1 kilobyte
             if not data:
@@ -39,7 +64,21 @@ class NmeaHandler:
             logger.error(f"Unexpected error:{e}")
 
 
-    def parse_data(self, sentence:str):
+    def parse_data(self, sentence:str)->dict:
+        """
+        Parses a given NMEA sentence
+        
+        Params:
+        --------
+        - sentence(str): a NMEa statement that follows MG predefined format
+
+        Returns:
+        --------
+        - dict | None: Parsed message as dictionary if sucessful, otherwise None
+
+        
+        """
+
         try:
             if not sentence.startswith('$') or '*' not in sentence:
                 logger.error(f"Invalid NMEA format {sentence}")
