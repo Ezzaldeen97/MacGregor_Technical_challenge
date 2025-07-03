@@ -5,9 +5,10 @@ import os
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
-
+from utils.logger import get_logger
 from configs import config,mb_registers_mapping
 
+logger = get_logger(__name__)
 class ModbusClientHandler:
     """
     A Simple wrapper to handle Modbus TCP Communiction.
@@ -35,11 +36,11 @@ class ModbusClientHandler:
         try:
             self.cnx=ModbusClient(host=self.host, port=self.port, unit_id=self.unit_id, timeout=0.1)
             if not self.cnx.open():
-                print("Unable to connect to Modbus Server")
+                logger.error("Unable to connect to Modbus Server")
             else:
-                print(f"Connection to Modbus Server on host '{self.host}' port '{self.port}' is successful")
+                logger.info(f"Connection to Modbus Server on host '{self.host}' port '{self.port}' is successful")
         except Exception as e:
-            print(f"Error in connecting to Modbus server {e}")
+            logger.error(f"Error in connecting to Modbus server {e}")
 
     def read_registers(self, register_address:int, number_of_registers:int) -> None:
         """
