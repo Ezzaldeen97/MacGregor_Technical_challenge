@@ -1,14 +1,14 @@
 import socket
 import sys
 import os
-HOST = "localhost"
-PORT = 8888
+
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
+from configs import config
 from utils.logger import get_logger
-from configs import config,mb_registers_mapping
 
-logger = get_logger(__name__)
+
+logger = get_logger(__name__, file_name= 'logs/nmea_client.log')
 class NmeaHandler:
     
     def __init__(self, port:int, host:str):
@@ -22,7 +22,7 @@ class NmeaHandler:
         print("Connected to NMEA server.")
 
     def read_nmea_data(self):
-        self.sentence = self.sock.recv(1024).decode('ascii')
+        self.sentence = self.sock.recv(1024).decode('ascii') #1 kilobyte
         return self.sentence
     def parse_data(self):
         try:
@@ -45,13 +45,9 @@ class NmeaHandler:
                     "checksum":checksum}
 
         except Exception as e:
-            logger.error(f"Failed to parse nmea message {e}")
+            logger.error(f"Failed to parse nmea message {e}")       
 
-
-
-        
-
-nmea_client=NmeaHandler(PORT, HOST)
+nmea_client=NmeaHandler(config.NMEA_PORT,config.NMEA_HOST)
 while True:
     nmea_client.read_nmea_data()
     print(nmea_client.parse_data())
