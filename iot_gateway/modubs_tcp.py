@@ -33,7 +33,7 @@ class ModbusClientHandler:
         try:
             self.cnx=ModbusClient(host=self.host, port=self.port, unit_id=self.unit_id, auto_open=True, timeout=0.1)
             if not self.cnx.is_open:
-                print("Unable to connect to Modubs Server")
+                print("Unable to connect to Modbus Server")
             else:
                 print("Connection successful")
         except Exception as e:
@@ -66,9 +66,10 @@ class ModbusClientHandler:
         if not self.values:
             self.connect() # in case connection was lost during parsing process
             return
-
+        
         for index, value in enumerate(self.values):
-            print(f"Sensor {mb_registers_mapping.mapping[index]} is {value} C")
+            sensor_name=mb_registers_mapping.mapping.get(index, "Unknown Sensor")
+            print(f"Sensor {sensor_name} is {value} C")
 
 client = ModbusClientHandler(host=config.MODBUS_HOST, port=config.MODUBS_PORT, unit_id=config.MODBUS_UNIT_ID)
 
