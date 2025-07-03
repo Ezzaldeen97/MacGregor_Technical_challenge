@@ -2,7 +2,7 @@ from pyModbusTCP.client import ModbusClient
 import time
 import sys
 import os
-
+from datetime import datetime
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 from utils.logger import get_logger
@@ -19,12 +19,13 @@ class ModbusClientHandler:
     - unit_id(int): The device id.
     - layer(str): The communication layer (default=TCP)
     """
-    def __init__(self,  host: str, port:int,unit_id:int, layer:str="TCP" ):
+    def __init__(self, host: str, port:int, unit_id:int, layer:str="TCP" ):
         self.host=host
         self.port = port
         self.layer=layer # Might be used in the future
         self.unit_id = unit_id
         self.connect() #Automatic attempt to connect
+        self.previous_values = []
 
     def connect(self) -> None:
         """
@@ -72,12 +73,31 @@ class ModbusClientHandler:
         
         for index, value in enumerate(self.values):
             sensor_name=mb_registers_mapping.mapping.get(index, "Unknown Sensor")
+            previous_value=self.previous_values[index]
+            datapoint = Datapoint(sensor_name, value, previous_value)
             print(f"Sensor {sensor_name} is {value} C")
+            self.previous_values[index] = datapoint  
 
 client = ModbusClientHandler(host=config.MODBUS_HOST, port=config.MODUBS_PORT, unit_id=config.MODBUS_UNIT_ID)
 
+class Datapoint:
+    def __init__(self, sensor, value, previous_datapoint):
+        self.sensor = sensor
+        self.value = value
+        self.previous_datapoint:Datapoint=previous_datapoint
+        self.changed = True  
+        self.send_point = True
+        self.timestamp=datetime.now()
+        self.evaluate_datapoint()
 
-
+    def evaluate_datapoint(self):
+        if not self.previous_datapoint: # The first data points (no previous) will be None
+            return
+        value_delta = abs(self.value - self.previous_datapoint.value)
+        time_delta = (self.timestamp - self.previous_datapoint.timestamp).total_seconds() /60
+        if value_delta <= config.MIN_TEMPURATE_CHANGE and time_delta < config.MIN_ELAPSED_TIME:
+            self.changed=False
+            self.send_point=False   
 
 while True:
     client.read_registers(0,4)
