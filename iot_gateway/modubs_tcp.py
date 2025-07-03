@@ -25,7 +25,7 @@ class ModbusClientHandler:
         self.layer=layer # Might be used in the future
         self.unit_id = unit_id
         self.connect() #Automatic attempt to connect
-        self.previous_values = []
+        self.previous_values = [None]*4
 
     def connect(self) -> None:
         """
@@ -58,7 +58,7 @@ class ModbusClientHandler:
         if not self.values: # in case connection was lost during reading process
             self.connect()
             return
-        print(f"Read values are:{self.values}")
+        # print(f"Read values are:{self.values}")
     
     def parse_readings(self) -> None:
         """
@@ -75,8 +75,14 @@ class ModbusClientHandler:
             sensor_name=mb_registers_mapping.mapping.get(index, "Unknown Sensor")
             previous_value=self.previous_values[index]
             datapoint = Datapoint(sensor_name, value, previous_value)
-            print(f"Sensor {sensor_name} is {value} C")
-            self.previous_values[index] = datapoint  
+            # print(f"Sensor {sensor_name} is {value} C")
+            self.previous_values[index] = datapoint
+            return datapoint
+    def read_temperature_sensor(self):
+        self.read_registers(0,4)
+        return self.parse_readings()
+   
+
 
 class Datapoint:
     """
@@ -125,10 +131,3 @@ class Datapoint:
             self.changed=False
             self.send_point=False 
 
-
-client = ModbusClientHandler(host=config.MODBUS_HOST, port=config.MODUBS_PORT, unit_id=config.MODBUS_UNIT_ID)
-
-while True:
-    client.read_registers(0,4)
-    client.parse_readings()
-    time.sleep(2)
