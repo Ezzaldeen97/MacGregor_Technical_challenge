@@ -2,10 +2,12 @@ from pyModbusTCP.client import ModbusClient
 import time
 import sys
 import os
-from configs import config,mb_registers_mapping
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+from configs import config,mb_registers_mapping
+
 class ModbusClientHandler:
     """
     A Simple wrapper to handle Modbus TCP Communiction.
@@ -31,11 +33,11 @@ class ModbusClientHandler:
             None
         """
         try:
-            self.cnx=ModbusClient(host=self.host, port=self.port, unit_id=self.unit_id, auto_open=True, timeout=0.1)
-            if not self.cnx.is_open:
+            self.cnx=ModbusClient(host=self.host, port=self.port, unit_id=self.unit_id, timeout=0.1)
+            if not self.cnx.open():
                 print("Unable to connect to Modbus Server")
             else:
-                print("Connection successful")
+                print(f"Connection to Modbus Server on host '{self.host}' port '{self.port}' is successful")
         except Exception as e:
             print(f"Error in connecting to Modbus server {e}")
 
