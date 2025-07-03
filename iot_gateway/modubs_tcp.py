@@ -131,3 +131,9 @@ class Datapoint:
             self.changed=False
             self.send_point=False 
 
+    def __str__(self):
+        date = self.timestamp.strftime("%Y-%m-%d")
+        time = self.timestamp.strftime("%H:%M")
+        status = "Valid" if self!= "V" else "Invalid"
+        return f"{self.value} C, {status}, {date} at {time} UTC"
+
