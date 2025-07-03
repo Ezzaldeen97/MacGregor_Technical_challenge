@@ -10,7 +10,7 @@ from configs import config
 from utils.logger import get_logger
 
 
-logger = get_logger(__name__, file_name= 'logs/nmea_client.log')
+logger = get_logger("nmea_logger", file_name= 'logs/nmea_client.log')
 class NmeaHandler:
     """
     A handler class for connecting to NMEA TCP stream, reading and parsing

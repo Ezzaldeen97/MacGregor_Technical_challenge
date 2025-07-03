@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from utils.logger import get_logger
 from configs import config,mb_registers_mapping
 
-logger = get_logger(__name__, file_name='logs/modbus_client.log')
+logger = get_logger("modbus_logger", file_name='logs/modbus_client.log')
 class ModbusClientHandler:
     """
     A Simple wrapper to handle Modbus TCP Communiction.
