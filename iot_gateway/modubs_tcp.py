@@ -13,7 +13,7 @@ class ModbusClientHandler:
     """
     A Simple wrapper to handle Modbus TCP Communiction.
 
-    Params:
+    Attributes:
     - Host(str): The Modbus Server host name.
     - port(int): The Modbus port.
     - unit_id(int): The device id.
@@ -47,7 +47,7 @@ class ModbusClientHandler:
         """
         A Method to read Modbus registers
 
-        Params:
+        Attributes:
         - register_address(int): The Starting address of the register to read from.
         - number_of_registers(int): The number of registers to read.
         Returns:
@@ -78,10 +78,30 @@ class ModbusClientHandler:
             print(f"Sensor {sensor_name} is {value} C")
             self.previous_values[index] = datapoint  
 
-client = ModbusClientHandler(host=config.MODBUS_HOST, port=config.MODUBS_PORT, unit_id=config.MODBUS_UNIT_ID)
 
 class Datapoint:
-    def __init__(self, sensor, value, previous_datapoint):
+    """
+    A helper class the represents a single sensor reading and its previous 
+    
+    Attributes:
+    
+    - sensor(str): the name of the sensor
+    - value(float): The current value of the sensor reading.
+    - previous_datapoint(Datapoint): The previous datapoint object for comparison.
+    - send_point(bool): A flag if the data point meets the criteria to be sent to the broker.
+    - timestamp(datetime): The timestamp of the current reading.
+
+    """
+    def __init__(self, sensor:str, value:float, previous_datapoint)->None:
+        """
+        Initialize a Datapoint object
+
+        Attributes:
+        - sensor(str): Sensor name
+        - value(float): Sensor reading value
+        - previous_datapoint(Datapoint): previous datapoint object
+        
+        """
         self.sensor = sensor
         self.value = value
         self.previous_datapoint:Datapoint=previous_datapoint
@@ -91,13 +111,23 @@ class Datapoint:
         self.evaluate_datapoint()
 
     def evaluate_datapoint(self):
+        """
+        Evaluate if the current reading differs from the previous one based on comparison criteria
+
+        If the temperature change is plus minus 1 degrees (MIN_TEMPURATE_CHANGE) and the time difference is less that 5 mins MIN_ELAPSED_TIME 
+        the data point will be marked as not for sending.
+
+        """
         if not self.previous_datapoint: # The first data points (no previous) will be None
             return
         value_delta = abs(self.value - self.previous_datapoint.value)
         time_delta = (self.timestamp - self.previous_datapoint.timestamp).total_seconds() /60
         if value_delta <= config.MIN_TEMPURATE_CHANGE and time_delta < config.MIN_ELAPSED_TIME:
             self.changed=False
-            self.send_point=False   
+            self.send_point=False 
+
+
+client = ModbusClientHandler(host=config.MODBUS_HOST, port=config.MODUBS_PORT, unit_id=config.MODBUS_UNIT_ID)
 
 while True:
     client.read_registers(0,4)
