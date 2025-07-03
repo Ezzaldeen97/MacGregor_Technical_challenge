@@ -1,7 +1,7 @@
 import socket
 import sys
 import os
-
+from datetime import datetime
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 from configs import config
@@ -23,6 +23,7 @@ class NmeaHandler:
     def __init__(self, port:int, host:str) -> None:
         self.port = port
         self.host = host
+        self.previous_datapoint=None
         self.connect()
 
     def connect(self) -> None:
@@ -88,20 +89,58 @@ class NmeaHandler:
                 fields= data.split(",")
                 talker_id = fields[0][1:3]
                 sentence_type= fields[0][3:]
-                rot_value= fields[1]
+                rot_value= float(fields[1])
                 status= fields[2]
-                return {
-                    "talker_id": talker_id,
-                    "sentence_type":sentence_type,
-                    "rate_of_turn_value": rot_value,
-                    "status":status,
-                    "checksum":checksum}
+
+                datapoint = Datapoint_Nmea(talker_id, sentence_type, rot_value, status, checksum,self.previous_datapoint)
+                self.previous_datapoint=datapoint
+                return datapoint
         except IndexError:
             logger.error("Error in index the nmea sentence")
         except Exception as e:
             logger.error(f"Failed to parse nmea message {e}")       
 
+
+class Datapoint_Nmea:
+    def __init__(self,talker_id, sentence_type, rot_value, status, checksum, previous_datapoint)->None:
+        """
+        Initialize a Datapoint object
+
+        Attributes:
+        - sensor(str): Sensor name
+        - value(float): Sensor reading value
+        - previous_datapoint(Datapoint): previous datapoint object
+        
+        """
+        self.talker_id = talker_id
+        self.sentence_type = sentence_type
+        self.previous_datapoint:Datapoint_Nmea=previous_datapoint
+        self.rot_value=rot_value
+        self.status=status
+        self.checksum=checksum
+        self.changed = True  
+
+        self.send_point = True
+        self.timestamp=datetime.now()
+        self.evaluate_datapoint()
+
+    def evaluate_datapoint(self):
+        """
+        Evaluate if the current reading differs from the previous one based on comparison criteria
+
+        If the temperature change is plus minus 1 degrees (MIN_TEMPERATURE_CHANGE) and the time difference is less that 5 mins MIN_ELAPSED_TIME 
+        the data point will be marked as not for sending.
+
+        """
+        if not self.previous_datapoint: # The first data points (no previous) will be None
+            return
+        value_delta = abs(self.rot_value - self.previous_datapoint.rot_value)
+        time_delta = (self.timestamp - self.previous_datapoint.timestamp).total_seconds() /60
+        if value_delta <= config.MIN_ROT_CHANGE and time_delta < config.MIN_ELAPSED_TIME:
+            self.changed=False
+            self.send_point=False 
+
 nmea_client=NmeaHandler(config.NMEA_PORT,config.NMEA_HOST)
 while True:
     sentence=nmea_client.read_nmea_data()
-    print(nmea_client.parse_data(sentence))
+    nmea_client.parse_data(sentence)
