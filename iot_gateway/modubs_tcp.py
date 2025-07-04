@@ -9,6 +9,8 @@ from utils.logger import get_logger
 from configs import config,mb_registers_mapping
 
 logger = get_logger("modbus_logger", file_name='logs/modbus_client.log')
+iot_logger = get_logger("iot_gatway_logger", file_name='logs/iot_gatway.log')
+
 class ModbusClientHandler:
     """
     A Simple wrapper to handle Modbus TCP Communiction.
@@ -39,6 +41,7 @@ class ModbusClientHandler:
             if not self.cnx.open():
                 logger.error("Unable to connect to Modbus Server")
             else:
+                iot_logger.info(f"Connection to Modbus Server on host '{self.host}' port '{self.port}' is successful")
                 logger.info(f"Connection to Modbus Server on host '{self.host}' port '{self.port}' is successful")
         except Exception as e:
             logger.error(f"Error in connecting to Modbus server {e}")

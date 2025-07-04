@@ -11,6 +11,7 @@ from utils.logger import get_logger
 
 
 logger = get_logger("nmea_logger", file_name= 'logs/nmea_client.log')
+iot_logger = get_logger("iot_gatway_logger", file_name='logs/iot_gatway.log')
 class NmeaHandler:
     """
     A handler class for connecting to NMEA TCP stream, reading and parsing
@@ -48,6 +49,8 @@ class NmeaHandler:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((self.host, self.port))
             logger.info(f"Connection to NMEA Websocket on host '{self.host}' port '{self.port}' is successful")
+            iot_logger.info(f"Connection to NMEA Websocket on host '{self.host}' port '{self.port}' is successful")
+     
         except socket.timeout:
             logger.error("Connection times out")
         except Exception as e:
@@ -68,6 +71,7 @@ class NmeaHandler:
             if not data:
                 self.connect()
                 logger.error("Socket Closed by server")
+                return 
             else:
                 messages= [f'${part}' for part in data.split('$') if part] # to recosntruct the messages.
                 return messages
@@ -151,9 +155,7 @@ class NmeaHandler:
         messages=self.read_nmea_data()
         if messages:
             return self.parse_data(messages)
-        
-
-
+        return
 
 class Datapoint_Nmea:
     def __init__(self,talker_id, sentence_type, rot_value, status, checksum, previous_datapoint)->None:
@@ -197,4 +199,4 @@ class Datapoint_Nmea:
         date = self.timestamp.strftime("%Y-%m-%d")
         time = self.timestamp.strftime("%H:%M")
         status = "Valid" if self.status != "V" else "Invalid"
-        return f"{self.rot_value}, {status}, {date} at {time} UTC"
+        return f"{self.rot_value} deg, {status}, {date} at {time} UTC"
