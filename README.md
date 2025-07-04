@@ -3,7 +3,7 @@
 This project is a technical solution based on MacGregor technical challenge
 
 ## Challenge Overview
-The IoT gateway is a simulated maritime Gateway that does the following
+The IoT gateway is a simulated maritime Gateway that does the following:
 - Reads temerature data from 4 luffing wich motors via **Modbus TCP**
 - Reads Rate of Turn (ROT) data via Websocket that follows **NMEA protocol** format
 - Connects and publish all data to a MQTT broker.
@@ -55,6 +55,8 @@ Below are  porential areas for future development:
 Containerize each component using Docker. This ensures Moduler deployements, simplifies scaling, and provides isolation within a single network
 - **Intermediate Database for Offline Mode** In case of a broker disconnection, data can be buffered to a local lightweight database(eg. SQLite).
 Once reconnected, the client can send the data to the broker in order.
+etry Mechanisms
+Many current connection attempts (MQTT, Modbus, NMEA) raise errors rather than retrying. Adding structured retry logic with backoff can greatly improve reliability.
 - **Dashboard intergratoon**
 A simple dashboard (eg.Grafana) can be connected to the broker to visualize the data send 
 - **Enhanced security** 
@@ -132,5 +134,3 @@ The data should appear in the mqtt broker dashboard
 
 ![alt text](utils/pics/image-6.png)
 
-
-## Final words
