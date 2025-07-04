@@ -55,7 +55,7 @@ Below are  porential areas for future development:
 Containerize each component using Docker. This ensures Moduler deployements, simplifies scaling, and provides isolation within a single network
 - **Intermediate Database for Offline Mode** In case of a broker disconnection, data can be buffered to a local lightweight database(eg. SQLite).
 Once reconnected, the client can send the data to the broker in order.
--**Retry Mechanisms**
+- **Retry Mechanisms**
 Many current connection attempts (MQTT, Modbus, NMEA) raise errors rather than retrying. Adding structured retry logic with backoff can greatly improve reliability.
 - **Dashboard intergratoon**
 A simple dashboard (eg.Grafana) can be connected to the broker to visualize the data send 
