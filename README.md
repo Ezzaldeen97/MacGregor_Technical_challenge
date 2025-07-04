@@ -10,7 +10,7 @@ The IoT gateway is a simulated maritime Gateway that does the following:
 
 
 ## Technical Details
-![alt text](utils/pics/project_overview.png)
+![alt text](utils/pics/Project_overview.png)
 ### Design and Architecture
 This Project is designed with modularity, and scalability and readability in mind:
 - **Modularity**:
