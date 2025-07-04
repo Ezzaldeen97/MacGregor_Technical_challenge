@@ -4,7 +4,7 @@ This project is a technical solution based on MacGregor technical challenge
 
 ## Challenge Overview
 The IoT gateway is a simulated maritime Gateway that does the following:
-- Reads temerature data from 4 luffing wich motors via **Modbus TCP**
+- Reads temperature data from 4 luffing winch motors via **Modbus TCP**
 - Reads Rate of Turn (ROT) data via Websocket that follows **NMEA protocol** format
 - Connects and publish all data to a MQTT broker.
 
@@ -23,7 +23,7 @@ Centralized Configuration (`configs/config.py`) that allows easy environment cha
 - **Scalability**
 The designed architecture supports easy extension by adding more sensors or protocols and adding their new modules and integrating them in main async loop.
 - **Readability**
-Having clear modules separation and well named functions to improve code readability was a Key requirements that ws essential to keep in mind.
+Having clear modules separation and well named functions to improve code readability was a Key requirements that was essential to keep in mind.
 ### Project Structure
 - **Modbus TCP Client** (`iot_gateway/modbus_client.py`)
 Reads temperature data from holding registers of a simulated Modbus server.
@@ -51,7 +51,7 @@ According to the task requirements, data should be published based on the follow
 ### Further developments
 This project represents an inital implementation of the task requirments. However Im fully aware that there are several enhancements and features that could significantly improve the project. In real-world applications, many of these additions would be **essential**.
 
-Below are  porential areas for future development:
+Below are  potential areas for future development:
 - **Dockerize Each Module**
 Containerize each component using Docker. This ensures Moduler deployements, simplifies scaling, and provides isolation within a single network
 - **Intermediate Database for Offline Mode** In case of a broker disconnection, data can be buffered to a local lightweight database(eg. SQLite).
@@ -61,10 +61,10 @@ Many current connection attempts (MQTT, Modbus, NMEA) raise errors rather than r
 - **Dashboard intergratoon**
 A simple dashboard (eg.Grafana) can be connected to the broker to visualize the data send 
 - **Enhanced security** 
-Intoruces **TSL/SSL** encryotion to the communciton between different components.
+Intoruces **TSL/SSL** encryption to the communciton between different components.
 
 - **Unit Testing**
-The current project is lacks unit tests, Having them improves quiality and maintainability during changes.
+The current project is lacks unit tests, Having them improves quality and maintainability during changes.
 - **CI/CD Pipeline**
 Automatics testing that is triggered automatically in GitHub or Gitlab.
 
