@@ -10,6 +10,7 @@ The IoT gateway is a simulated maritime Gateway that does the following:
 
 
 ## Technical Details
+![alt text](utils/pics/project_overview.png)
 ### Design and Architecture
 This Project is designed with modularity, and scalability and readability in mind:
 - **Modularity**:
@@ -102,8 +103,9 @@ once done you should see the cluster dashboard:
 ![alt text](utils/pics/image.png)
 
 ### 4.3 Copy Cluster URL 
-![alt text](utils/pics/image-1.png)
 
+![alt text](utils/pics/image-1.png)
+This url needs to be added to ``configs/config.py``
 ### 4.4 Create Credentials 
 Generate Username and password and add them to ```configs/config.py```
 
@@ -111,11 +113,11 @@ Generate Username and password and add them to ```configs/config.py```
 
 ![alt text](utils/pics/image-3.png)
 
-Make sure to Replace the place holders in the config file with the username and password.
+
 ### 4.5 Setup the web client in the Server
 ![alt text](utils/pics/image-4.png)
 
-Enter the username and password created in the previous step
+Enter the username and password created in the previous step and connect
 
 ### 4.6 Subscripe to a topic (or use # wildcard)
 ![alt text](utils/pics/image-5.png)
