@@ -70,14 +70,15 @@ class ModbusClientHandler:
         if not self.values:
             self.connect() # in case connection was lost during parsing process
             return
-        
+        datapoints=[]
         for index, value in enumerate(self.values):
             sensor_name=mb_registers_mapping.mapping.get(index, "Unknown Sensor")
             previous_value=self.previous_values[index]
             datapoint = Datapoint(sensor_name, value, previous_value)
             # print(f"Sensor {sensor_name} is {value} C")
             self.previous_values[index] = datapoint
-            return datapoint
+            datapoints.append(datapoint)
+        return datapoints
     def read_temperature_sensor(self):
         self.read_registers(0,4)
         return self.parse_readings()
