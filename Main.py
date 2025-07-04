@@ -84,6 +84,10 @@ async def calculate_timeout(timeout:int = 60 *config.MAX_ELAPSED_TIME):
 
 
 async def main():
+    """
+    Main entry point for the IoT gateway. Connects to the Mqtt broker and runs all polling task in parallel
+    
+    """
     await asyncio.gather(poll_rot_sensor(),
                          poll_temerature_sensors(),
                          calculate_timeout())        
