@@ -1,2 +1,2 @@
 pyModbusTCP
-paho-mqtt >2.0
+paho-mqtt <2.0
